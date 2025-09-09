@@ -18,7 +18,7 @@ st.markdown("""
         background-image: url("https://raw.githubusercontent.com/RGiovanetti/demo_gp/main/GP.png");
         background-repeat: no-repeat;
         background-position: top right;
-        background-size: 150px; /* Tamaño del logo */
+        background-size: 400px; /* Tamaño del logo */
     }
     .main {
         background-color: rgba(255, 255, 255, 0.9);
