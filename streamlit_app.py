@@ -12,10 +12,10 @@ st.set_page_config(page_title="Fraude GP", page_icon="🕵️", layout="wide")
 st.markdown("""
     <style>
     body {
-        background-color: #f9fafc;
+        background-color: #F8F8F8; /* Un gris claro para el fondo */
     }
-    h1, h2, h3, h4 {
-        color: #0A2342;
+    h1, h2, h3, h4, h5, h6 {
+        color: #004B8C; /* Un azul oscuro que combina con la paleta */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -26,9 +26,9 @@ st.markdown("""
 st.title("👨‍💻 Detección de Fraude GP")
 st.markdown(
     """
-    **Demo de detección de fraude**  
-    
-    Permite realizar un análisis rápido con filtros y visualizaciones.  
+    **Demo de detección de fraude**
+
+    Permite realizar un análisis rápido con filtros y visualizaciones.
     """
 )
 
@@ -80,15 +80,15 @@ st.dataframe(df_transactions, use_container_width=True)
 st.subheader("📈 Análisis Visual de Transacciones")
 
 if not df_transactions.empty:
-    # Paleta de colores personalizada
-    colors = plt.cm.Set3.colors
+    # Paleta de colores vibrante
+    colors = ["#0077B6", "#00B4D8", "#48CAE4", "#90E0EF", "#00A591", "#1B6535"]
 
-    # --- Gráfico 1 y 2 lado a lado ---
-    col1, col2 = st.columns(2)
+    # --- Gráfico 1, 2, 3 y 4 en 4 columnas ---
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.markdown("#### Distribución por Tipo de Tarjeta")
+        st.markdown("#### Tipo de Tarjeta")
         card_counts = df_transactions['TIPO_TARJETA'].value_counts()
-        fig_card, ax_card = plt.subplots(figsize=(5, 5))
+        fig_card, ax_card = plt.subplots(figsize=(2, 2))
         ax_card.pie(card_counts, labels=card_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
                     colors=colors[:len(card_counts)])
@@ -98,43 +98,43 @@ if not df_transactions.empty:
     with col2:
         st.markdown("#### Distribución por Ciudad")
         city_counts = df_transactions['CIUDAD_TRANSACCION'].value_counts()
-        fig_city, ax_city = plt.subplots(figsize=(5, 5))
+        fig_city, ax_city = plt.subplots(figsize=(2, 2))
         ax_city.pie(city_counts, labels=city_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
                     colors=colors[:len(city_counts)])
         ax_city.axis('equal')
         st.pyplot(fig_city)
 
-    # --- Gráfico 3: Riesgo ---
-    st.markdown("#### Distribución por Nivel de Riesgo")
-    risk_counts = df_transactions['RIESGO_FRAUDE'].fillna('Sin Riesgo').value_counts()
-    fig_risk, ax_risk = plt.subplots(figsize=(6, 4))
-    ax_risk.bar(risk_counts.index, risk_counts.values, color=colors[:len(risk_counts)])
-    ax_risk.set_ylabel("Cantidad")
-    ax_risk.set_xlabel("Nivel de Riesgo")
-    st.pyplot(fig_risk)
+    with col3:
+        st.markdown("#### Nivel de Riesgo")
+        risk_counts = df_transactions['RIESGO_FRAUDE'].fillna('Sin Riesgo').value_counts()
+        fig_risk, ax_risk = plt.subplots(figsize=(3, 2))
+        ax_risk.bar(risk_counts.index, risk_counts.values, color=colors[0])
+        ax_risk.set_ylabel("Cantidad")
+        ax_risk.set_xlabel("Nivel de Riesgo")
+        st.pyplot(fig_risk)
 
-    # --- Gráfico 4: Horarios ---
-    st.markdown("#### Distribución por Rango Horario")
-    df_transactions['HORA'] = pd.to_datetime(df_transactions['FECHA_TRANSACCION']).dt.hour
+    with col4:
+        st.markdown("#### Rango Horario")
+        df_transactions['HORA'] = pd.to_datetime(df_transactions['FECHA_TRANSACCION']).dt.hour
 
-    def get_hour_range(hour):
-        if 0 <= hour < 6: return '00:00 - 06:00'
-        elif 6 <= hour < 12: return '06:00 - 12:00'
-        elif 12 <= hour < 18: return '12:00 - 18:00'
-        else: return '18:00 - 24:00'
+        def get_hour_range(hour):
+            if 0 <= hour < 6: return '00:00 - 06:00'
+            elif 6 <= hour < 12: return '06:00 - 12:00'
+            elif 12 <= hour < 18: return '12:00 - 18:00'
+            else: return '18:00 - 24:00'
 
-    df_transactions['RANGO_HORARIO'] = df_transactions['HORA'].apply(get_hour_range)
-    hour_counts = df_transactions['RANGO_HORARIO'].value_counts(normalize=True).reset_index()
-    hour_counts.columns = ['Rango Horario', 'Porcentaje']
-    hour_counts['Porcentaje'] = (hour_counts['Porcentaje'] * 100).round(2)
+        df_transactions['RANGO_HORARIO'] = df_transactions['HORA'].apply(get_hour_range)
+        hour_counts = df_transactions['RANGO_HORARIO'].value_counts(normalize=True).reset_index()
+        hour_counts.columns = ['Rango Horario', 'Porcentaje']
+        hour_counts['Porcentaje'] = (hour_counts['Porcentaje'] * 100).round(2)
 
-    fig_hour, ax_hour = plt.subplots(figsize=(6, 4))
-    ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'], color="#1f77b4")
-    ax_hour.set_ylabel('Porcentaje (%)')
-    ax_hour.set_xlabel('Rango Horario')
-    plt.xticks(rotation=45, ha='right')
-    st.pyplot(fig_hour)
+        fig_hour, ax_hour = plt.subplots(figsize=(3, 2))
+        ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'], color=colors[1])
+        ax_hour.set_ylabel('Porcentaje (%)')
+        ax_hour.set_xlabel('Rango Horario')
+        plt.xticks(rotation=45, ha='right')
+        st.pyplot(fig_hour)
 
 else:
     st.info("No hay transacciones para mostrar. Intenta seleccionar un filtro diferente.")
@@ -161,7 +161,7 @@ if not df_transactions.empty:
             update_query = f"""
                 UPDATE DEMO_FRAUDE_DB.DEMO_FRAUDE_SCHEMA.TRANSACCIONES
                 SET RIESGO_FRAUDE = {risk_value},
-                    COMENTARIO = '{comment_text.replace("'", "''")}'
+                COMENTARIO = '{comment_text.replace("'", "''")}'
                 WHERE ID_TRANSACCION = '{transaction_to_update}'
             """
             session.sql(update_query).collect()
