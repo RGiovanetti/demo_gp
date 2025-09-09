@@ -12,10 +12,18 @@ st.set_page_config(page_title="Fraude GP", page_icon="🕵️", layout="wide")
 st.markdown("""
     <style>
     body {
-        background-color: #F8F8F8; /* Un gris claro para el fondo */
+        background-color: #0077B6; /* El azul para el fondo */
     }
-    h1, h2, h3, h4, h5, h6 {
-        color: #004B8C; /* Un azul oscuro que combina con la paleta */
+    .main {
+        background-color: #FFFFFF;
+        padding: 2rem;
+        border-radius: 10px;
+    }
+    h1 {
+        color: #8A2BE2; /* Violeta para el título principal */
+    }
+    h2, h3, h4, h5, h6 {
+        color: #00A591; /* Verde para los subtítulos */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -81,7 +89,7 @@ st.subheader("📈 Análisis Visual de Transacciones")
 
 if not df_transactions.empty:
     # Paleta de colores vibrante
-    colors = ["#0077B6", "#00B4D8", "#48CAE4", "#90E0EF", "#00A591", "#1B6535"]
+    colors = ["#00B4D8", "#48CAE4", "#90E0EF", "#00A591", "#1B6535", "#8A2BE2"]
 
     # --- Gráfico 1, 2, 3 y 4 en 4 columnas ---
     col1, col2, col3, col4 = st.columns(4)
@@ -91,7 +99,8 @@ if not df_transactions.empty:
         fig_card, ax_card = plt.subplots(figsize=(2, 2))
         ax_card.pie(card_counts, labels=card_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
-                    colors=colors[:len(card_counts)])
+                    colors=colors[:len(card_counts)],
+                    textprops={'fontsize': 8}) # Ajuste de fuente para las etiquetas
         ax_card.axis('equal')
         st.pyplot(fig_card)
 
@@ -101,7 +110,8 @@ if not df_transactions.empty:
         fig_city, ax_city = plt.subplots(figsize=(2, 2))
         ax_city.pie(city_counts, labels=city_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
-                    colors=colors[:len(city_counts)])
+                    colors=colors[:len(city_counts)],
+                    textprops={'fontsize': 8}) # Ajuste de fuente para las etiquetas
         ax_city.axis('equal')
         st.pyplot(fig_city)
 
@@ -110,8 +120,9 @@ if not df_transactions.empty:
         risk_counts = df_transactions['RIESGO_FRAUDE'].fillna('Sin Riesgo').value_counts()
         fig_risk, ax_risk = plt.subplots(figsize=(3, 2))
         ax_risk.bar(risk_counts.index, risk_counts.values, color=colors[0])
-        ax_risk.set_ylabel("Cantidad")
-        ax_risk.set_xlabel("Nivel de Riesgo")
+        ax_risk.set_ylabel("Cantidad", fontsize=8)
+        ax_risk.set_xlabel("Nivel de Riesgo", fontsize=8)
+        ax_risk.tick_params(axis='both', which='major', labelsize=8)
         st.pyplot(fig_risk)
 
     with col4:
@@ -131,9 +142,10 @@ if not df_transactions.empty:
 
         fig_hour, ax_hour = plt.subplots(figsize=(3, 2))
         ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'], color=colors[1])
-        ax_hour.set_ylabel('Porcentaje (%)')
-        ax_hour.set_xlabel('Rango Horario')
-        plt.xticks(rotation=45, ha='right')
+        ax_hour.set_ylabel('Porcentaje (%)', fontsize=8)
+        ax_hour.set_xlabel('Rango Horario', fontsize=8)
+        plt.xticks(rotation=45, ha='right', fontsize=8)
+        ax_hour.tick_params(axis='both', which='major', labelsize=8)
         st.pyplot(fig_hour)
 
 else:
