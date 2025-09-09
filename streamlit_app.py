@@ -31,7 +31,7 @@ st.markdown("""
 # --------------------------------------------------------
 # TÍTULO DE LA APLICACIÓN
 # --------------------------------------------------------
-st.title("👨‍💻 Detección de Fraude GP")
+st.title("👨‍💻 Detección de Fraude GLOBAL PROCESSING")
 st.markdown(
     """
     **Demo de detección de fraude**
