@@ -4,19 +4,36 @@ import time
 import matplotlib.pyplot as plt
 
 # --------------------------------------------------------
+# ESTILO GLOBAL
+# --------------------------------------------------------
+st.set_page_config(page_title="Fraude GP", page_icon="🕵️", layout="wide")
+
+# Fondo y estilo custom (CSS)
+st.markdown("""
+    <style>
+    body {
+        background-color: #f9fafc;
+    }
+    h1, h2, h3, h4 {
+        color: #0A2342;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --------------------------------------------------------
 # TÍTULO DE LA APLICACIÓN
 # --------------------------------------------------------
 st.title("👨‍💻 Detección de Fraude GP")
 st.markdown(
     """
-    Demo de detección de fraude:
+    **Demo de detección de fraude**  
     
-    Permite realizar un rápido análisis con filtros.
+    Permite realizar un análisis rápido con filtros y visualizaciones.  
     """
 )
 
 # --------------------------------------------------------
-# CONEXIÓN A SNOWFLAKE USANDO st.connection
+# CONEXIÓN A SNOWFLAKE
 # --------------------------------------------------------
 try:
     cnx = st.connection("snowflake")
@@ -27,7 +44,7 @@ except Exception as e:
     st.stop()
 
 # --------------------------------------------------------
-# CARGAR Y CACHEAR DATOS
+# FUNCIÓN PARA CARGAR DATOS
 # --------------------------------------------------------
 @st.cache_data(ttl=600)
 def load_data(filter_risk=None):
@@ -48,9 +65,9 @@ def load_data(filter_risk=None):
     return df
 
 # --------------------------------------------------------
-# INTERFAZ DE USUARIO
+# INTERFAZ DE FILTRO
 # --------------------------------------------------------
-st.subheader("Visualización de Transacciones")
+st.subheader("📊 Visualización de Transacciones")
 risk_options = ["Todos", "ALTO", "MEDIO", "BAJO", "Vacío"]
 selected_risk = st.selectbox("Filtrar por nivel de riesgo:", options=risk_options)
 
@@ -60,38 +77,45 @@ st.dataframe(df_transactions, use_container_width=True)
 # --------------------------------------------------------
 # VISUALIZACIÓN DE GRÁFICOS
 # --------------------------------------------------------
-st.subheader("Análisis de Transacciones")
+st.subheader("📈 Análisis Visual de Transacciones")
 
 if not df_transactions.empty:
-    # --- Gráfico 1: Distribución por Tipo de Tarjeta ---
-    st.markdown("### Distribución de Transacciones por Tipo de Tarjeta")
-    card_counts = df_transactions['TIPO_TARJETA'].value_counts()
-    fig_card, ax_card = plt.subplots()
-    ax_card.pie(card_counts, labels=card_counts.index, autopct='%1.1f%%',
-                startangle=90, wedgeprops=dict(width=0.4))
-    ax_card.axis('equal')
-    st.pyplot(fig_card)
+    # Paleta de colores personalizada
+    colors = plt.cm.Set3.colors
 
-    # --- Gráfico 2: Distribución por Ciudad ---
-    st.markdown("### Distribución de Transacciones por Ciudad")
-    city_counts = df_transactions['CIUDAD_TRANSACCION'].value_counts()
-    fig_city, ax_city = plt.subplots()
-    ax_city.pie(city_counts, labels=city_counts.index, autopct='%1.1f%%',
-                startangle=90, wedgeprops=dict(width=0.4))
-    ax_city.axis('equal')
-    st.pyplot(fig_city)
+    # --- Gráfico 1 y 2 lado a lado ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("#### Distribución por Tipo de Tarjeta")
+        card_counts = df_transactions['TIPO_TARJETA'].value_counts()
+        fig_card, ax_card = plt.subplots(figsize=(5, 5))
+        ax_card.pie(card_counts, labels=card_counts.index, autopct='%1.1f%%',
+                    startangle=90, wedgeprops=dict(width=0.4),
+                    colors=colors[:len(card_counts)])
+        ax_card.axis('equal')
+        st.pyplot(fig_card)
 
-    # --- Gráfico 3: Distribución por Nivel de Riesgo ---
-    st.markdown("### Distribución de Transacciones por Nivel de Riesgo")
+    with col2:
+        st.markdown("#### Distribución por Ciudad")
+        city_counts = df_transactions['CIUDAD_TRANSACCION'].value_counts()
+        fig_city, ax_city = plt.subplots(figsize=(5, 5))
+        ax_city.pie(city_counts, labels=city_counts.index, autopct='%1.1f%%',
+                    startangle=90, wedgeprops=dict(width=0.4),
+                    colors=colors[:len(city_counts)])
+        ax_city.axis('equal')
+        st.pyplot(fig_city)
+
+    # --- Gráfico 3: Riesgo ---
+    st.markdown("#### Distribución por Nivel de Riesgo")
     risk_counts = df_transactions['RIESGO_FRAUDE'].fillna('Sin Riesgo').value_counts()
-    fig_risk, ax_risk = plt.subplots()
-    ax_risk.pie(risk_counts, labels=risk_counts.index, autopct='%1.1f%%',
-                startangle=90, wedgeprops=dict(width=0.4))
-    ax_risk.axis('equal')
+    fig_risk, ax_risk = plt.subplots(figsize=(6, 4))
+    ax_risk.bar(risk_counts.index, risk_counts.values, color=colors[:len(risk_counts)])
+    ax_risk.set_ylabel("Cantidad")
+    ax_risk.set_xlabel("Nivel de Riesgo")
     st.pyplot(fig_risk)
 
-    # --- Gráfico 4: Distribución por Rango Horario ---
-    st.markdown("### Distribución de Transacciones por Rango Horario")
+    # --- Gráfico 4: Horarios ---
+    st.markdown("#### Distribución por Rango Horario")
     df_transactions['HORA'] = pd.to_datetime(df_transactions['FECHA_TRANSACCION']).dt.hour
 
     def get_hour_range(hour):
@@ -105,8 +129,8 @@ if not df_transactions.empty:
     hour_counts.columns = ['Rango Horario', 'Porcentaje']
     hour_counts['Porcentaje'] = (hour_counts['Porcentaje'] * 100).round(2)
 
-    fig_hour, ax_hour = plt.subplots()
-    ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'])
+    fig_hour, ax_hour = plt.subplots(figsize=(6, 4))
+    ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'], color="#1f77b4")
     ax_hour.set_ylabel('Porcentaje (%)')
     ax_hour.set_xlabel('Rango Horario')
     plt.xticks(rotation=45, ha='right')
@@ -118,15 +142,14 @@ else:
 # --------------------------------------------------------
 # ACTUALIZAR RIESGO DE FRAUDE
 # --------------------------------------------------------
-st.subheader("Actualizar Nivel de Riesgo")
-st.markdown("Usa este panel para marcar transacciones con un riesgo de fraude específico.")
+st.subheader("✏️ Actualizar Nivel de Riesgo")
 
 if not df_transactions.empty:
     transaction_id_list = df_transactions['ID_TRANSACCION'].tolist()
-    transaction_to_update = st.selectbox("Selecciona el ID de la transacción a actualizar:", options=transaction_id_list)
+    transaction_to_update = st.selectbox("Selecciona el ID de la transacción:", options=transaction_id_list)
 
-    new_risk = st.radio("Selecciona el nuevo nivel de riesgo:", options=["ALTO", "MEDIO", "BAJO", "Vacío"])
-    comment_text = st.text_area("Añade un comentario (opcional):", placeholder="Ej: Sospecha de compra inusual en el extranjero.")
+    new_risk = st.radio("Nuevo nivel de riesgo:", options=["ALTO", "MEDIO", "BAJO", "Vacío"])
+    comment_text = st.text_area("Comentario (opcional):", placeholder="Ej: Sospecha de compra inusual en el extranjero.")
 
     if st.button("Actualizar Transacción"):
         try:
@@ -150,5 +173,3 @@ if not df_transactions.empty:
 
         except Exception as e:
             st.error(f"Error al actualizar la transacción: {e}")
-else:
-    st.info("No hay transacciones para mostrar, por lo que no se pueden seleccionar IDs para actualizar.")
