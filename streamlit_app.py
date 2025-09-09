@@ -12,10 +12,15 @@ st.set_page_config(page_title="Fraude GP", page_icon="🕵️", layout="wide")
 st.markdown("""
     <style>
     body {
-        background-color: #0077B6; /* El azul para el fondo */
+        background-color: #F8F8F8; /* Un gris claro para el fondo */
+    }
+    .stApp {
+        background-image: url("https://placehold.co/1920x1080/0077B6/0077B6?text="); /* Imagen de fondo con el azul GP */
+        background-size: cover;
+        background-attachment: fixed;
     }
     .main {
-        background-color: #FFFFFF;
+        background-color: rgba(255, 255, 255, 0.9);
         padding: 2rem;
         border-radius: 10px;
     }
@@ -31,7 +36,7 @@ st.markdown("""
 # --------------------------------------------------------
 # TÍTULO DE LA APLICACIÓN
 # --------------------------------------------------------
-st.title("👨‍💻 Detección de Fraude GLOBAL PROCESSING")
+st.title("👨‍💻 Detección de Fraude GP")
 st.markdown(
     """
     **Demo de detección de fraude**
@@ -100,7 +105,7 @@ if not df_transactions.empty:
         ax_card.pie(card_counts, labels=card_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
                     colors=colors[:len(card_counts)],
-                    textprops={'fontsize': 8}) # Ajuste de fuente para las etiquetas
+                    textprops={'fontsize': 4}) # Este es el tamaño de la fuente de los porcentajes en los gráficos.
         ax_card.axis('equal')
         st.pyplot(fig_card)
 
@@ -111,7 +116,7 @@ if not df_transactions.empty:
         ax_city.pie(city_counts, labels=city_counts.index, autopct='%1.1f%%',
                     startangle=90, wedgeprops=dict(width=0.4),
                     colors=colors[:len(city_counts)],
-                    textprops={'fontsize': 8}) # Ajuste de fuente para las etiquetas
+                    textprops={'fontsize': 4}) # Este es el tamaño de la fuente de los porcentajes en los gráficos.
         ax_city.axis('equal')
         st.pyplot(fig_city)
 
@@ -120,8 +125,8 @@ if not df_transactions.empty:
         risk_counts = df_transactions['RIESGO_FRAUDE'].fillna('Sin Riesgo').value_counts()
         fig_risk, ax_risk = plt.subplots(figsize=(3, 2))
         ax_risk.bar(risk_counts.index, risk_counts.values, color=colors[0])
-        ax_risk.set_ylabel("Cantidad", fontsize=8)
-        ax_risk.set_xlabel("Nivel de Riesgo", fontsize=8)
+        ax_risk.set_ylabel("Cantidad", fontsize=4)
+        ax_risk.set_xlabel("Nivel de Riesgo", fontsize=4)
         ax_risk.tick_params(axis='both', which='major', labelsize=8)
         st.pyplot(fig_risk)
 
@@ -142,9 +147,9 @@ if not df_transactions.empty:
 
         fig_hour, ax_hour = plt.subplots(figsize=(3, 2))
         ax_hour.bar(hour_counts['Rango Horario'], hour_counts['Porcentaje'], color=colors[1])
-        ax_hour.set_ylabel('Porcentaje (%)', fontsize=8)
-        ax_hour.set_xlabel('Rango Horario', fontsize=8)
-        plt.xticks(rotation=45, ha='right', fontsize=8)
+        ax_hour.set_ylabel('Porcentaje (%)', fontsize=4)
+        ax_hour.set_xlabel('Rango Horario', fontsize=4)
+        plt.xticks(rotation=45, ha='right', fontsize=4)
         ax_hour.tick_params(axis='both', which='major', labelsize=8)
         st.pyplot(fig_hour)
 
